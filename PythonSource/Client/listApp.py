@@ -26,7 +26,7 @@ class ListAppForm:
         self.tree.heading("#3", text="Count")
         self.tree.pack()
 
-        self.root.protocol("WM_DELETE_WINDOW", self.form_closing)
+        # self.root.protocol("WM_DELETE_WINDOW", self.form_closing)
 
     def start(self):
         self.root.mainloop()

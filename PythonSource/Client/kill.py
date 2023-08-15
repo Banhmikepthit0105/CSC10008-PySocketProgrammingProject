@@ -1,50 +1,37 @@
 import tkinter as tk
+from tkinter import Button, Entry, messagebox
 
-class KillForm:
-    def __init__(self, client):
-        self.client = client
+class KillForm(tk.Tk):
+    def __init__(self, nw, nr):
+        super().__init__()
 
-        self.root = tk.Tk()
-        self.root.title("Kill Process")
+        self.nw = nw
+        self.nr = nr
 
-        self.label = tk.Label(self.root, text="Enter Process ID:")
-        self.label.pack()
+        self.title("Kill")
+        self.geometry("300x100")
 
-        self.txtID = tk.Entry(self.root)
+        self.txtID = Entry(self)
         self.txtID.pack()
 
-        self.butNhap = tk.Button(self.root, text="Kill", command=self.butNhap_Click)
+        self.butNhap = Button(self, text="Nhap", command=self.butNhap_Click)
         self.butNhap.pack()
 
-        self.root.protocol("WM_DELETE_WINDOW", self.form_closing)
-
-    def start(self):
-        self.root.mainloop()
+        # self.protocol("WM_DELETE_WINDOW", self.kill_closing)
 
     def butNhap_Click(self):
-        process_id = self.txtID.get()
-        if process_id:
-            self.send_message("KILLID")
-            self.send_message(process_id)
-            response = self.receive_message()
-            tk.messagebox.showinfo("Kết quả", response)
+        self.nw.write("KILLID\n")
+        self.nw.write(self.txtID.get() + "\n")
+        self.nw.flush()
 
-    def form_closing(self):
-        self.send_message("QUIT")
-        self.root.destroy()
+        s = self.nr.readline().strip()
+        messagebox.showinfo("Thông báo", s)
 
-    def send_message(self, message):
-        if self.client:
-            self.client.sendall(message.encode())
-
-    def receive_message(self):
-        try:
-            response = self.client.recv(1024).decode()
-            return response
-        except:
-            return "Error receiving response"
+    def kill_closing(self):
+        self.nw.write("QUIT\n")
+        self.nw.flush()
+        self.destroy()
 
 if __name__ == "__main__":
-    client = None  
-    kill_form = KillForm(client)
-    kill_form.start()
+    app = KillForm(None, None)  # Replace None with actual nw and nr streams
+    app.mainloop()

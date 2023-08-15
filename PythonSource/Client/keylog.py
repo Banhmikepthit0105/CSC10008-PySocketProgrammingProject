@@ -1,68 +1,61 @@
 import tkinter as tk
+from tkinter import Button, Text
 import threading
 
-class KeylogForm:
-    def __init__(self, client):
-        self.client = client
+class KeylogForm(tk.Toplevel):
+    def __init__(self, nw, nr):
+        super().__init__()
 
-        self.root = tk.Tk()
-        self.root.title("Keylog")
+        self.root = tk.Tk()  # Create the main window
+        self.title("Keylog")
+        self.geometry("300x300")
+        self.nw = nw
+        self.nr = nr
 
-        self.butHook = tk.Button(self.root, text="Hook", command=self.butHook_Click)
-        self.butHook.pack()
+        self.button1 = Button(self, text="Hook", command=self.button1_Click)
+        self.button1.pack()
 
-        self.butUnhook = tk.Button(self.root, text="Unhook", command=self.butUnhook_Click)
-        self.butUnhook.pack()
+        self.button2 = Button(self, text="Unhook", command=self.button2_Click)
+        self.button2.pack()
 
-        self.butPrint = tk.Button(self.root, text="Print", command=self.butPrint_Click)
-        self.butPrint.pack()
+        self.button3 = Button(self, text="Print", command=self.button3_Click)
+        self.button3.pack()
 
-        self.butClear = tk.Button(self.root, text="Clear", command=self.butClear_Click)
-        self.butClear.pack()
-
-        self.txtKQ = tk.Text(self.root, wrap=tk.WORD, height=10, width=50)
+        self.txtKQ = Text(self)
         self.txtKQ.pack()
 
-        self.root.protocol("WM_DELETE_WINDOW", self.form_closing)
+        self.butXoa = Button(self, text="Xóa", command=self.butXoa_Click)
+        self.butXoa.pack()
 
-    def start(self):
-        self.root.mainloop()
+        self.protocol("WM_DELETE_WINDOW", self.keylog_closing)
 
-    def butHook_Click(self):
-        self.send_message("HOOK")
+    def button1_Click(self):
+        s = "HOOK"
+        self.nw.write(s)
+        self.nw.flush()
 
-    def butUnhook_Click(self):
-        self.send_message("UNHOOK")
+    def button2_Click(self):
+        s = "UNHOOK"
+        self.nw.write(s)
+        self.nw.flush()
 
-    def butPrint_Click(self):
-        self.send_message("PRINT")
-        data = self.receive_data(5000)
+    def button3_Click(self):
+        s = "PRINT"
+        self.nw.write(s)
+        self.nw.flush()
+
+        data = self.nr.read(5000).decode("utf-8")
         self.txtKQ.insert(tk.END, data)
 
-    def butClear_Click(self):
+    def keylog_closing(self):
+        s = "QUIT"
+        self.nw.write(s)
+        self.nw.flush()
+        self.destroy()
+
+    def butXoa_Click(self):
         self.txtKQ.delete("1.0", tk.END)
 
-    def form_closing(self):
-        self.send_message("QUIT")
-        self.root.destroy()
-
-    def send_message(self, message):
-        if self.client:
-            self.client.sendall(message.encode())
-
-    def receive_data(self, size):
-        data = b""
-        while len(data) < size:
-            try:
-                chunk = self.client.recv(size - len(data))
-                if not chunk:
-                    break
-                data += chunk
-            except:
-                break
-        return data.decode()
-
 if __name__ == "__main__":
-    client = None  # Replace this with your actual client socket object
-    keylog_form = KeylogForm(client)
-    keylog_form.start()
+    app = KeylogForm(None, None)  # Replace None with actual nw and nr streams
+    app.mainloop()

@@ -1,196 +1,135 @@
-#---------TESTING THE COMUNICATION BETWEEN CLIENT AND SERVER--------------------------
-
-
-# import socket
-
-# SERVER =  "127.0.0.1"
-# PORT = 5000
-# ADDRESS = (SERVER, PORT)
-# HEADER_SIZE = 1024
-# DISCONNECT_MESSAGE = "!DISCONNECT"
-# FORMAT = "utf-8"
-
-
-# client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# server_address = (ADDRESS)
-# # print("Client connect to server with port: " + str(PORT))
-# client.connect(ADDRESS)
-
-# # try: 
-# #     while True:
-# #         msg = input('Client: ')
-# #         client.sendall(bytes(msg, FORMAT))
-# # except KeyboardInterrupt:
-# #     client.close()
-# # finally:
-# #     client.close()
-
-
-# def sendMessage(msg):
-#     message = msg.encode(FORMAT)
-#     message_length = len(message)
-#     send_length = str(message_length).encode(FORMAT)
-#     send_length += b' ' * (HEADER_SIZE - len(send_length))
-#     client.send(send_length)
-#     client.send(message)
-
-# sendMessage("Hello World")
-# sendMessage("Hello Thai")
-# sendMessage("Hello WORLDD")
-# sendMessage("Hellooooo")
-# sendMessage("Hellooooo")
-# sendMessage(DISCONNECT_MESSAGE)
-
-
-#------------MAIN CLIENT APPLICATION----------------------
 import tkinter as tk
+from tkinter import messagebox
 import socket
-import threading
+from GUI.handle_listAppGUI import ListApp
+from GUI.handle_picsGUI import Pic 
+from GUI.handle_keylogGUI import Keylog 
+from GUI.handle_processGUI import Process  
 
-class ClientApp:
+
+
+class ClientApp(tk.Tk):
     def __init__(self):
-        self.client = None
+        super().__init__()
 
-        self.root = tk.Tk()
-        self.root.title("Client")
+        self.title("Client")
+        self.geometry("300x250")
 
-        self.butApp = tk.Button(self.root, text="App Running", command=self.butApp_Click)
-        self.butApp.pack()
-
-        self.butConnect = tk.Button(self.root, text="Kết nối", command=self.butConnect_Click)
+        self.butConnect = tk.Button(self, text="Connect", command=self.connect_to_server)
         self.butConnect.pack()
 
-        self.txtIP = tk.Entry(self.root)
-        self.txtIP.insert(0, "Nhập IP")
-        self.txtIP.pack()
+        self.butApp = tk.Button(self, text="List Applications", command=self.open_applications)
+        self.butApp.pack()
 
-        self.butTat = tk.Button(self.root, text="Tắt máy", command=self.butTat_Click)
-        self.butTat.pack()
-
-        self.butReg = tk.Button(self.root, text="Sửa registry", command=self.butReg_Click)
+        self.butReg = tk.Button(self, text="Registry", command=self.open_registry)
         self.butReg.pack()
 
-        self.butExit = tk.Button(self.root, text="Thoát", command=self.butExit_Click)
-        self.butExit.pack()
-
-        self.butPic = tk.Button(self.root, text="Chụp màn hình", command=self.butPic_Click)
+        self.butPic = tk.Button(self, text="Take Picture", command=self.take_picture)
         self.butPic.pack()
 
-        self.butKeyLock = tk.Button(self.root, text="Keystroke", command=self.butKeyLock_Click)
-        self.butKeyLock.pack()
+        self.butKeyLog = tk.Button(self, text="Keylogger", command=self.open_keylogger)
+        self.butKeyLog.pack()
 
-        self.butProcess = tk.Button(self.root, text="Process Running", command=self.butProcess_Click)
+        self.butProcess = tk.Button(self, text="Processes", command=self.open_processes)
         self.butProcess.pack()
 
-        self.root.protocol("WM_DELETE_WINDOW", self.client_Closing)
+        self.butShutdown = tk.Button(self, text="Shutdown", command=self.shutdown)
+        self.butShutdown.pack()
 
-    def start(self):
-        self.root.mainloop()
+        self.butExit = tk.Button(self, text="Exit", command=self.exit_client)
+        self.butExit.pack()
 
-    def butApp_Click(self):
-        if self.client is None:
-            self.show_message("Chưa kết nối đến server")
-            return
+        self.client = None
+        self.nw = None
+        self.nr = None
 
-        s = "APPLICATION"
-        self.send_message(s)
-        self.show_message("App Running")
-        # Add code to handle the response and open the corresponding dialog
+        self.protocol("WM_DELETE_WINDOW", self.client_closing)
 
-    def butConnect_Click(self):
-        ip = self.txtIP.get()
-        if not ip:
-            self.show_message("Vui lòng nhập IP")
+    def connect_to_server(self):
+        if self.client:
+            messagebox.showinfo("Info", "Already connected to server.")
             return
 
         try:
+            server_ip = self.txtIP.get()
+            server_port = 5656
             self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.client.connect((ip, 5656))
-            self.show_message("Kết nối đến server thành công")
-            self.start_receiver_thread()
-        except Exception as ex:
-            self.show_message("Lỗi kết nối đến server")
+            self.client.connect((server_ip, server_port))
+            self.nw = self.client.makefile(mode="w")
+            self.nr = self.client.makefile(mode="r")
+            messagebox.showinfo("Info", "Connected to server successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", "Failed to connect to server: " + str(e))
+            self.client = None
 
-    def start_receiver_thread(self):
-        threading.Thread(target=self.receive_thread).start()
-
-    def receive_thread(self):
-        while self.client:
-            try:
-                data = self.client.recv(1024).decode()
-                if not data:
-                    break
-                # Process received data
-            except:
-                break
-        self.client = None
-
-    def send_message(self, message):
-        if self.client:
-            self.client.sendall(message.encode())
-
-    def butTat_Click(self):
-        if self.client is None:
-            self.show_message("Chưa kết nối đến server")
+    def open_applications(self):
+        if not self.client:
+            messagebox.showinfo("Info", "Not connected to server.")
             return
 
-        s = "SHUTDOWN"
-        self.send_message(s)
+        self.nw.write("APPLICATION\n")
+        self.nw.flush()
+        viewApp = ListApp(self.nw, self.nr)
+        viewApp.wait_window()
+
+
+    def take_picture(self):
+        if not self.client:
+            messagebox.showinfo("Info", "Not connected to server.")
+            return
+
+        self.nw.write("TAKEPIC\n")
+        self.nw.flush()
+        viewPic = Pic(self.nw, self.nr)
+        viewPic.lam()
+        viewPic.wait_window()
+
+    def open_keylogger(self):
+        if not self.client:
+            messagebox.showinfo("Info", "Not connected to server.")
+            return
+
+        self.nw.write("KEYLOG\n")
+        self.nw.flush()
+        viewKeylog = Keylog(self.nw, self.nr)
+        viewKeylog.wait_window()
+
+    def open_processes(self):
+        if not self.client:
+            messagebox.showinfo("Info", "Not connected to server.")
+            return
+
+        self.nw.write("PROCESS\n")
+        self.nw.flush()
+        viewProcess = Process(self.nw, self.nr)
+        viewProcess.wait_window()
+
+    def shutdown(self):
+        if not self.client:
+            messagebox.showinfo("Info", "Not connected to server.")
+            return
+
+        self.nw.write("SHUTDOWN\n")
+        self.nw.flush()
         self.client.close()
         self.client = None
 
-    def butReg_Click(self):
-        if self.client is None:
-            self.show_message("Chưa kết nối đến server")
-            return
-
-        s = "REGISTRY"
-        self.send_message(s)
-        self.show_message("Sửa registry")
-        # Add code to handle the response and open the corresponding dialog
-
-    def butExit_Click(self):
-        s = "QUIT"
-        self.send_message(s)
-        self.root.destroy()
-
-    def butPic_Click(self):
-        if self.client is None:
-            self.show_message("Chưa kết nối đến server")
-            return
-
-        s = "TAKEPIC"
-        self.send_message(s)
-        # Add code to handle the response and open the corresponding dialog
-
-    def butKeyLock_Click(self):
-        if self.client is None:
-            self.show_message("Chưa kết nối đến server")
-            return
-
-        s = "KEYLOG"
-        self.send_message(s)
-        # Add code to handle the response and open the corresponding dialog
-
-    def butProcess_Click(self):
-        if self.client is None:
-            self.show_message("Chưa kết nối đến server")
-            return
-
-        s = "PROCESS"
-        self.send_message(s)
-        # Add code to handle the response and open the corresponding dialog
-
-    def client_Closing(self):
+    def exit_client(self):
         if self.client:
-            self.send_message("QUIT")
+            self.nw.write("QUIT\n")
+            self.nw.flush()
             self.client.close()
-            self.client = None
-        self.root.destroy()
 
-    def show_message(self, message):
-        tk.messagebox.showinfo("Thông báo", message)
+        self.destroy()
+
+    def client_closing(self):
+        if self.client:
+            self.nw.write("QUIT\n")
+            self.nw.flush()
+            self.client.close()
+
+        self.destroy()
 
 if __name__ == "__main__":
     app = ClientApp()
-    app.start()
+    app.mainloop()

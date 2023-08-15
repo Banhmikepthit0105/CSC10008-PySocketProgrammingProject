@@ -1,23 +1,18 @@
 import tkinter as tk
 
-class KillForm:
-    def __init__(self, client):
-        self.client = client
+class KillForm(tk.Tk):
+    def __init__(self):
+        super().__init__()
 
-        self.root = tk.Tk()
-        self.root.title("Kill Process")
+        self.title("Kill")
+        self.geometry("284x45")
 
-        self.txtID = tk.Entry(self.root)
-        self.txtID.insert(0, "Nhập ID")
-        self.txtID.pack()
+        self.txtID = tk.Entry(self)
+        self.txtID.insert(0, "NHẬP ID")
+        self.txtID.grid(row=0, column=0, padx=13, pady=13)
 
-        self.butNhap = tk.Button(self.root, text="Kill", command=self.butNhap_Click)
-        self.butNhap.pack()
-
-        self.root.protocol("WM_DELETE_WINDOW", self.form_closing)
-
-    def start(self):
-        self.root.mainloop()
+        self.butNhap = tk.Button(self, text="Kill", command=self.butNhap_Click)
+        self.butNhap.grid(row=0, column=1, padx=13, pady=13)
 
     def butNhap_Click(self):
         process_id = self.txtID.get()
@@ -43,6 +38,5 @@ class KillForm:
             return "Error receiving response"
 
 if __name__ == "__main__":
-    client = None  # Replace this with your actual client socket object
-    kill_form = KillForm(client)
-    kill_form.start()
+    app = KillForm()
+    app.mainloop()
