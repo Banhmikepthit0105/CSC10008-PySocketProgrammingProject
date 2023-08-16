@@ -1,61 +1,61 @@
 import tkinter as tk
-from tkinter import Button, Text
-import threading
+import socket
 
-class KeylogForm(tk.Toplevel):
-    def __init__(self, nw, nr):
-        super().__init__()
+SERVER =  "127.0.0.1"
+PORT = 5000
+ADDRESS = (SERVER, PORT)
+HEADER_SIZE = 1024
+FORMAT = 'utf-8'
 
-        self.root = tk.Tk()  # Create the main window
-        self.title("Keylog")
-        self.geometry("300x300")
-        self.nw = nw
-        self.nr = nr
+class KeylogApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Keylog App")
 
-        self.button1 = Button(self, text="Hook", command=self.button1_Click)
-        self.button1.pack()
+        self.button_hook = tk.Button(root, text="Hook", command=self.hook)
+        self.button_hook.pack()
 
-        self.button2 = Button(self, text="Unhook", command=self.button2_Click)
-        self.button2.pack()
+        self.button_unhook = tk.Button(root, text="Unhook", command=self.unhook)
+        self.button_unhook.pack()
 
-        self.button3 = Button(self, text="Print", command=self.button3_Click)
-        self.button3.pack()
+        self.button_print = tk.Button(root, text="Print", command=self.print_keylog)
+        self.button_print.pack()
 
-        self.txtKQ = Text(self)
-        self.txtKQ.pack()
+        self.txt_kq = tk.Text(root, height=10, width=40)
+        self.txt_kq.pack()
 
-        self.butXoa = Button(self, text="Xóa", command=self.butXoa_Click)
-        self.butXoa.pack()
+        self.button_clear = tk.Button(root, text="Clear", command=self.clear)
+        self.button_clear.pack()
 
-        self.protocol("WM_DELETE_WINDOW", self.keylog_closing)
+        self.root.protocol("WM_DELETE_WINDOW", self.keylog_app_closing)
 
-    def button1_Click(self):
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.connect(ADDRESS)
+
+    def hook(self):
         s = "HOOK"
-        self.nw.write(s)
-        self.nw.flush()
+        self.client.send(s.encode(FORMAT))
 
-    def button2_Click(self):
+    def unhook(self):
         s = "UNHOOK"
-        self.nw.write(s)
-        self.nw.flush()
+        self.client.send(s.encode(FORMAT))
 
-    def button3_Click(self):
+    def print_keylog(self):
         s = "PRINT"
-        self.nw.write(s)
-        self.nw.flush()
+        self.client.send(s.encode(FORMAT))
+        data = self.client.recv(HEADER_SIZE).decode(FORMAT)
+        self.txt_kq.insert(tk.END, data)
 
-        data = self.nr.read(5000).decode("utf-8")
-        self.txtKQ.insert(tk.END, data)
+    def clear(self):
+        self.txt_kq.delete(1.0, tk.END)
 
-    def keylog_closing(self):
+    def keylog_app_closing(self):
         s = "QUIT"
-        self.nw.write(s)
-        self.nw.flush()
-        self.destroy()
-
-    def butXoa_Click(self):
-        self.txtKQ.delete("1.0", tk.END)
+        self.client.send(s.encode(FORMAT))
+        self.client.close()
+        self.root.destroy()
 
 if __name__ == "__main__":
-    app = KeylogForm(None, None)  # Replace None with actual nw and nr streams
-    app.mainloop()
+    root = tk.Tk()
+    app = KeylogApp(root)
+    root.mainloop()

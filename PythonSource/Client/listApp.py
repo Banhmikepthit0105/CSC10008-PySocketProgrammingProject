@@ -1,91 +1,112 @@
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import ttk
+import socket
 
-class ListAppForm:
-    def __init__(self, client):
-        self.client = client
+SERVER =  "127.0.0.1"
+PORT = 5000
+ADDRESS = (SERVER, PORT)
+HEADER_SIZE = 1024
+FORMAT = 'utf-8'
 
-        self.root = tk.Tk()
-        self.root.title("List Applications")
+class ListApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("List App")
 
-        self.button1 = tk.Button(self.root, text="XEM", command=self.button1_Click)
-        self.button1.pack()
+        self.button_refresh = tk.Button(root, text="Refresh List", command=self.refresh_list)
+        self.button_refresh.pack()
 
-        self.button2 = tk.Button(self.root, text="KILL", command=self.button2_Click)
-        self.button2.pack()
+        self.button_kill = tk.Button(root, text="Kill Process", command=self.kill_process)
+        self.button_kill.pack()
 
-        self.button3 = tk.Button(self.root, text="START", command=self.button3_Click)
-        self.button3.pack()
+        self.button_start = tk.Button(root, text="Start Process", command=self.start_process)
+        self.button_start.pack()
 
-        self.button4 = tk.Button(self.root, text="Reset List", command=self.button4_Click)
-        self.button4.pack()
+        self.button_clear = tk.Button(root, text="Clear List", command=self.clear_list)
+        self.button_clear.pack()
 
-        self.tree = ttk.Treeview(self.root, columns=("Name", "ID", "Count"))
-        self.tree.heading("#1", text="Name")
-        self.tree.heading("#2", text="ID")
-        self.tree.heading("#3", text="Count")
-        self.tree.pack()
+        self.list_view = ttk.Treeview(root, columns=("Name", "ID", "Count"), show="headings")
+        self.list_view.heading("Name", text="Name")
+        self.list_view.heading("ID", text="ID")
+        self.list_view.heading("Count", text="Count")
+        self.list_view.pack()
 
-        # self.root.protocol("WM_DELETE_WINDOW", self.form_closing)
+        self.root.protocol("WM_DELETE_WINDOW", self.list_app_closing)
 
-    def start(self):
-        self.root.mainloop()
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.connect(ADDRESS)
 
-    def button1_Click(self):
-        self.send_message("XEM")
-        soprocess = int(self.receive_message())
-        for i in range(soprocess):
-            s1 = self.receive_message()
+    def refresh_list(self):
+        self.list_view.delete(*self.list_view.get_children())
+        
+        temp = "XEM"
+        self.client.send(temp.encode(FORMAT))
+        temp = self.client.recv(HEADER_SIZE).decode(FORMAT)
+        soprocess = int(temp)
+
+        for _ in range(soprocess):
+            s1 = self.client.recv(HEADER_SIZE).decode(FORMAT)
             if s1 == "ok":
-                s1 = self.receive_message()
-                s2 = self.receive_message()
-                s3 = self.receive_message()
-                self.tree.insert("", "end", values=(s1, s2, s3))
+                s1 = self.client.recv(HEADER_SIZE).decode(FORMAT)
+                s2 = self.client.recv(HEADER_SIZE).decode(FORMAT)
+                s3 = self.client.recv(HEADER_SIZE).decode(FORMAT)
+                self.list_view.insert("", "end", values=(s1, s2, s3))
 
-    def button2_Click(self):
-        self.send_message("KILL")
-        kill_form = KillForm(self.client)
-        kill_form.start()
+    def kill_process(self):
+        temp = "KILL"
+        self.client.send(temp.encode(FORMAT))
+        temp = self.client.recv(HEADER_SIZE).decode(FORMAT)
+        if temp == "ok":
+            kill_dialog = Kill(self.root)
+            kill_dialog.wait_window()
 
-    def button3_Click(self):
-        self.send_message("START")
-        start_form = StartForm(self.client)
-        start_form.start()
+    def start_process(self):
+        temp = "START"
+        self.client.send(temp.encode(FORMAT))
+        temp = self.client.recv(HEADER_SIZE).decode(FORMAT)
+        if temp == "ok":
+            start_dialog = Start(self.root)
+            start_dialog.wait_window()
 
-    def button4_Click(self):
-        for item in self.tree.get_children():
-            self.tree.delete(item)
+    def clear_list(self):
+        self.list_view.delete(*self.list_view.get_children())
 
-    def form_closing(self):
-        self.send_message("QUIT")
+    def list_app_closing(self):
+        temp = "QUIT"
+        self.client.send(temp.encode(FORMAT))
+        self.client.close()
         self.root.destroy()
 
-    def send_message(self, message):
-        if self.client:
-            self.client.sendall(message.encode())
+class Kill(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Kill Process")
 
-    def receive_message(self):
-        try:
-            response = self.client.recv(1024).decode()
-            return response
-        except:
-            return "Error receiving response"
+        self.label = tk.Label(self, text="Kill Process Dialog")
+        self.label.pack()
 
-class KillForm:
-    def __init__(self, client):
-        self.client = client
-        # Initialize the KillForm GUI components here
+        self.button_ok = tk.Button(self, text="OK", command=self.ok)
+        self.button_ok.pack()
 
-    # Implement the rest of the KillForm methods here
+    def ok(self):
+        self.destroy()
 
-class StartForm:
-    def __init__(self, client):
-        self.client = client
-        # Initialize the StartForm GUI components here
+class Start(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Start Process")
 
-    # Implement the rest of the StartForm methods here
+        self.label = tk.Label(self, text="Start Process Dialog")
+        self.label.pack()
+
+        self.button_ok = tk.Button(self, text="OK", command=self.ok)
+        self.button_ok.pack()
+
+    def ok(self):
+        self.destroy()
 
 if __name__ == "__main__":
-    client = None  # Replace this with your actual client socket object
-    list_app_form = ListAppForm(client)
-    list_app_form.start()
+    root = tk.Tk()
+    app = ListApp(root)
+    root.mainloop()
