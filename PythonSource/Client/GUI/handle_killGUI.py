@@ -37,6 +37,9 @@ class KillForm(tk.Tk):
         except:
             return "Error receiving response"
 
-if __name__ == "__main__":
+def mainKill():
     app = KillForm()
     app.mainloop()
+
+if __name__ == "__main__":
+    mainKill()

@@ -60,8 +60,10 @@ class ListAppForm:
         except:
             return "Error receiving response"
 
-
-if __name__ == "__main__":
+def mainListApp():
     root = tk.Tk()
     app = ListAppForm(root)
-    root.mainloop()
+    root.mainloop() 
+
+if __name__ == "__main__":
+    mainListApp()

@@ -78,8 +78,9 @@ class KeylogForm:
             return response
         except:
             return "Error receiving response"
-
-
-if __name__ == "__main__":
+def mainKeylogger():
     app = KeylogForm(None, None)  # Replace None with actual nw and nr streams
     app.run()
+
+if __name__ == "__main__":
+    mainKeylogger()

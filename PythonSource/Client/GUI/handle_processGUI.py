@@ -44,8 +44,14 @@ class process(tk.Tk):
         # Code for process_closing event
         pass
 
-# Create an instance of the process class
-app = process()
 
-# Run the application
-app.mainloop()
+def mainProcess():
+    # Create an instance of the process class
+    app = process()
+
+    # Run the application
+    app.mainloop()
+
+
+if __name__ == "__main__":
+    mainProcess()

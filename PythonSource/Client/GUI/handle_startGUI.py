@@ -25,6 +25,12 @@ class StartApp(tk.Tk):
         # Add your logic for handling form closing here
         self.destroy()
 
-if __name__ == "__main__":
+
+
+def mainStart():
     app = StartApp()
     app.mainloop()
+
+
+if __name__ == "__main__":
+    mainStart()

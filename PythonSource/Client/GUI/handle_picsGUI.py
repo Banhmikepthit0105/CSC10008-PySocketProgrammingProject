@@ -1,5 +1,5 @@
 from tkinter import Button, filedialog, Label, Tk
-from PIL import ImageGrab, Image, ImageTk
+# from PIL import ImageGrab, Image
 
 class PicApp(Tk):
     def __init__(self):
@@ -35,6 +35,9 @@ class PicApp(Tk):
     def pic_closing(self):
         self.destroy()
 
-if __name__ == "__main__":
+def mainPics():
     app = PicApp()
-    app.mainloop()
+    app.mainloop()   
+
+if __name__ == "__main__":
+    mainPics()

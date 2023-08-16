@@ -60,6 +60,14 @@ class ClientApp(tk.Tk):
     def butProcess_Click(self):
         pass
 
-if __name__ == "__main__":
+def on_closing(app):
+    app.quit()
+
+def mainClient():
     app = ClientApp()
+    app.protocol("WM_DELETE_WINDOW",lambda: on_closing(app))
     app.mainloop()
+
+
+if __name__ == "__main__":
+    mainClient()
