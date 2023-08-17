@@ -1,11 +1,11 @@
 from tkinter import Button, filedialog, Label, Tk
-# from PIL import ImageGrab, Image
+from PIL import ImageGrab, Image, ImageTk
 
 class PicApp(Tk):
     def __init__(self):
         super().__init__()
 
-        self.title("pic")
+        self.title("Take picture")
         self.geometry("402x300")
 
         self.picture = Label(self)

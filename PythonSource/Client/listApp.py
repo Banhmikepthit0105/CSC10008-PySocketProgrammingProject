@@ -32,10 +32,6 @@ class ListApp:
         self.list_view.heading("Count", text="Count")
         self.list_view.pack()
 
-        self.root.protocol("WM_DELETE_WINDOW", self.list_app_closing)
-
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client.connect(ADDRESS)
 
     def refresh_list(self):
         self.list_view.delete(*self.list_view.get_children())

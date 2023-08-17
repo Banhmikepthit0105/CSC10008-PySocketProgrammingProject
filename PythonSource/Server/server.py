@@ -2,6 +2,9 @@
 
 import socket
 import threading
+import process
+import runningapp
+from pics import *
 
 SERVER =  "127.0.0.1"
 PORT = 5000
@@ -10,50 +13,37 @@ HEADER_SIZE = 1024
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(ADDRESS)
-server.listen(1)
-print("waiting for client")
-connected, address = server.accept()
-
-try:
+def runClientSocket(connected):
     while True:
-        data = connected.recv(HEADER_SIZE)  
-        if len(data) > 0:
-            print("Server received: " + data.decode(FORMAT))
-            respond = data.decode(FORMAT)
-            connected.send(respond.encode(FORMAT))
-except KeyboardInterrupt:
-    connected.close()
-    server.close()
-finally:
-    connected.close()
-    server.close()
+        try:
+            while True:
+                data = connected.recv(HEADER_SIZE)
+                if len(data) > 0:
+                    msg = data.decode(FORMAT)
+                    print("Server received: " + msg)
+                    if (msg == "takepicture"):     
+                        sendScreenShot(connected)
+                    if (msg == "showlistapp"):
+                        runningapp.listRunningApp(connected)
+                    if (msg == "killprocess"):
+                        process.killProcess(connected)
+
+        except KeyboardInterrupt:
+            connected.close()
+        finally:
+            connected.close()
 
 
+def start_server():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(ADDRESS)
+    server.listen(1)
+    while True:
+        print("Waiting for client...")
+        connected, address = server.accept()
+        print("Got a connection from %s" % str(address))
+        client_handler = threading.Thread(target=runClientSocket, args=(connected,))
+        client_handler.start()
 
-# def handle_client(connected, address):
-#     print(f"[NEW CONNECTION] {address} connected")
-
-#     while True:
-#         message_length = connected.recv(HEADER_SIZE).decode(FORMAT)
-#         if (message_length):
-#             message_length = int(message_length)
-#             message = connected.recv(message_length).decode(FORMAT)
-#             if message == DISCONNECT_MESSAGE:
-#                 connected.close()
-#                 break;
-#         print(f"[{address}:] {message}")
-#     print(f"[DISCONNECTED] {address} disconnected")
-
-
-# def start():
-#     server.listen(1)
-#     while True:
-#         connected, address = server.accept()
-#         thread = threading.Thread(target = handle_client, args= (connected, address))
-#         thread.start()
-#         print(f"[ACTIVATE CONNECTION], Server is connected by {threading.active_count() - 1}")
-
-# print("[STARTING] Server is waiting for client")
-# start()    
+if __name__ == "__main__":
+    start_server()
