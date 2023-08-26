@@ -1,4 +1,4 @@
 import os
 
-def shutdown():
-    os.system("shutdown /s /t 1")
+def my_shutdown():
+    os.system("shutdown /s /t 20")

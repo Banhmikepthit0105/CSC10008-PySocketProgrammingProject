@@ -1,0 +1,6 @@
+5520,Sever,19
+7892,Windows PowerShell,13
+7820,Client,103
+7820,Program Manager,103
+5568,Nguyễn Thành (Nguyễn Thành Thái),44
+1696,Visual Studio Code,42
