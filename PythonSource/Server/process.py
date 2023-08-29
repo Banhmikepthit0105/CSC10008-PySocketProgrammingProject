@@ -2,6 +2,7 @@ import psutil
 import struct
 import _json
 import signal
+import shutil
 import subprocess
 import errno
 import os
@@ -16,9 +17,19 @@ FORMAT = 'utf-8'
 def startProcess(process_name):
 
     try:
+    #         app_name = str(appName)
+    # if (shutil.which(app_name)) is None:
+    #     return "Application with name \" {} \" not found ".format(app_name)
+
+        if (shutil.which(process_name)) is None:
+            return "Process with name '{}' is not found".format(process_name)
+
         subprocess.Popen(process_name, shell=True)
-        return "Process '{}' started successfully".format(process_name)
+        return "Process with name '{}' started successfully".format(process_name)
+    
         # return "The process with name '{}' does not exists.".format(process_name)
+
+
 
     except (FileNotFoundError, ModuleNotFoundError, OSError, LookupError) as err:
         return "Error occurred: {}".format(str(err))

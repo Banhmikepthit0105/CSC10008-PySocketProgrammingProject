@@ -1,6 +1,10 @@
-5520,Sever,19
-7892,Windows PowerShell,13
-7820,Client,103
-7820,Program Manager,103
-5568,Nguyễn Thành (Nguyễn Thành Thái),44
-1696,Visual Studio Code,42
+23956,Snipping Tool,18
+332,SO,48
+1764,Notepad,20
+7944,Nguyễn Thành (Nguyễn Thành Thái),46
+7844,Sever,20
+9788,Windows PowerShell,17
+6828,PowerPoint,55
+1764,Notepad,20
+20060,Visual Studio Code,41
+20652,Program Manager,76

@@ -697,7 +697,6 @@ class ClientApp(tk.Tk):
 
 
 
-
     def deletelistProcess(self, my_tree):
         self.my_tree.delete(*my_tree.get_children())
         with open(file_pathProcess, 'w') as file:

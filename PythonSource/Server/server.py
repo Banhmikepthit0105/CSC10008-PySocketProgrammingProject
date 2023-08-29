@@ -186,7 +186,7 @@ import tkinter
 
 
 
-SERVER =  "127.0.0.1"
+SERVER =  "127.0.0.3"
 PORT = 5000
 ADDRESS = (SERVER, PORT)
 HEADER_SIZE = 1024
@@ -267,7 +267,6 @@ def runClientSocket(connected):
                         my_shutdown()
         except:
             print("Client disconnected")
-            config.init()
             # connected.close()
             return
 
@@ -277,7 +276,11 @@ def start_server():
     global server
     try: 
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.bind(ADDRESS)
+        # host = ''
+        host_name = socket.gethostname()
+        ip_address = socket.gethostbyname(host_name)
+        server.bind((ip_address, PORT))
+        # server.bind((host, PORT))
         server.listen(5)
         messagebox.showinfo("Message", "Server has started successfully")
         if server_running == False:
