@@ -442,8 +442,7 @@ class ClientApp(tk.Tk):
 
 
 
-                # Create a label to display the response message
-    # Create a label to display the response message
+
                 lbl_response = tk.Label(frame, text=response, bg="#0b0e43", fg="#FFD66D")
                 lbl_response.pack(padx=10, pady=10)
 
@@ -460,8 +459,7 @@ class ClientApp(tk.Tk):
     def on_xoa_button_click(self, treeApp):
         self.treeApp.delete(*treeApp.get_children())
 
-        # for i in self.treeApp.get_children():
-        #     self.treeApp.delete(i)
+
 
 
 
@@ -541,33 +539,7 @@ class ClientApp(tk.Tk):
         number_of_processes_bytes = self.client.recv(4)
         number_of_processes = struct.unpack('!I', number_of_processes_bytes)[0]
 
-        # # Receive and print the process information
-        # for _ in range(number_of_processes):
-        #     # Receive the length of the process info string
-        #     process_info_length_bytes = self.client.recv(4)
-        #     process_info_length = struct.unpack('!I', process_info_length_bytes)[0]
-
-        #     # Receive the process info string
-        #     process_info_bytes = self.client.recv(process_info_length)
-        #     process_info = process_info_bytes.decode(FORMAT)
-
-        #     # Print the process info
-        #     # print(process_info)
-        #     proc = process_info.split(",")
-        #     if (len(proc) >= 1):
-        #         pid = proc[0]
-        #         name = proc[1]
-        #         num_threads = proc[2]
-        
-        #     # Insert the process data into the tree
-        #     self.my_tree.insert("", "end", values=(pid, name, num_threads))
-
-        # # Adjust the column widths to fit the content
-        # for col in self.my_tree["columns"]:
-        #     self.my_tree.column(col, width=150 )
-        #     self.my_tree.heading(col, text=col)
-    
-        # Create a list to hold process information
+   
         process_data = []
 
         # Receive and store the process information

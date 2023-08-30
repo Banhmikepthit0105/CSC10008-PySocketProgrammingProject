@@ -45,48 +45,6 @@ def startRunningApp(appName):
     except Exception as e:
         return "Error occured: {}".format(str(e))
 
-# def checkValidApp(w):
-#     try:
-#         full_title = w.window_text()
-#         if full_title == "Taskbar" or full_title == "": return False
-#         proc_id = w.process_id()
-#         process = psutil.Process(proc_id)
-#         thread_count = process.num_threads()
-#     except psutil.NoSuchProcess:
-#         return False 
-#     if ' - ' in full_title:
-#         app_name = full_title.rsplit(' - ', 1)[1]
-#     else:
-#         app_name = full_title
-#     return f'{proc_id},{app_name},{thread_count}'
-
-
-
-
-# def send_string(client_socket, s):
-#     # Send the length of the string
-#     client_socket.sendall(struct.pack('!I', len(s)))
-#     # Send the string itself
-#     client_socket.sendall(s.encode(FORMAT))
-
-
-# def send_string_list(client_socket, string_list):
-#     # Convert the list to a JSON string
-#     string_list_json = json.dumps(string_list)
-#     # Send the JSON string
-#     send_string(client_socket, string_list_json)
-
-# def listRunningApp(clientsocket):
-#     windows = Desktop(backend="uia").windows()
-#     runningApp = []
-#     for w in windows:
-#         tmp = checkValidApp(w)
-#         if (tmp == False) : continue 
-#         runningApp.append(tmp)
-#     send_string_list(clientsocket, runningApp)
-#     print("DONE")
-
-
 
 def checkValidApp(w, q):
     try:
